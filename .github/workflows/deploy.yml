@@ -26,9 +26,9 @@ jobs:
       - run: npm ci
       - run: npm run docs:build
         env:
-          # 项目站点（https://<user>.github.io/<repo>/）必须带仓库名前缀，
-          # 写成 '/' 会白屏且没有任何报错。用户站点则把这里改成 '/'
-          DOCS_BASE: /${{ github.event.repository.name }}/
+          # 站点挂在自定义域名根路径（https://blog.093681.xyz/），所以是 '/'
+          # 如果哪天改回 https://<user>.github.io/<repo>/，这里要写 /<repo>/
+          DOCS_BASE: /
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
