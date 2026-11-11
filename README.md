@@ -2,7 +2,7 @@
 
 AI Agent / RAG 学习笔记的静态站点，用 [VitePress](https://vitepress.dev) 构建，部署在 GitHub Pages。
 
-**线上地址：<https://toccoa.github.io/ai-docs/>**
+**线上地址：<https://blog.093681.xyz/>**（GitHub Pages + Cloudflare，旧地址 `toccoa.github.io/ai-docs` 自动跳转）
 
 ## 结构
 
