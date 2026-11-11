@@ -29,10 +29,14 @@ const kb = (n) => `${(n / 1024).toFixed(0)} KB`
 /**
  * 把单个图片转成 webp。
  * 返回 { out, before, after, width } —— out 为 webp 绝对路径；已转过的返回 null。
+ *
+ * destAbs 可指定落点（publish.mjs 会把图放到 content/图片/… 而不是源目录旁边）；
+ * 不传就写在源文件旁边的同名 .webp。
  */
-export async function convert(absImg) {
+export async function convert(absImg, destAbs) {
   if (!SRC_RE.test(absImg)) return null
-  const out = absImg.replace(SRC_RE, '.webp')
+  const out = destAbs || absImg.replace(SRC_RE, '.webp')
+  fs.mkdirSync(path.dirname(out), { recursive: true })
   const before = fs.statSync(absImg).size
 
   // 已经有转好的 webp 就直接复用（重复发布同一篇文章时会走到这里）

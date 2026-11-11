@@ -17,7 +17,7 @@ Agent 的记忆可以采用类似的分工。Agent 会把大量工作记录在�
 
 我们发现，dreaming 是帮助我们赋予 Claude 有效记忆的一个有用工具。在这篇文章中，我们分享我们是如何思考 agent 记忆的，并逐一走过我们用来探索 agent 记忆的几项评估——包括 dreaming 的使用，以及每个组件对记忆组织各自贡献了什么。
 
-![图 1：session 之间的四层记忆层级，以及旁边的 dreaming 循环](Anthropic-Agent-Memory-图片/fig01-记忆层级总览.webp)
+![图 1：session 之间的四层记忆层级，以及旁边的 dreaming 循环](../../Anthropic-Agent-Memory-图片/fig01-记忆层级总览.webp)
 
 > **图 1**：一个 session 与下一个 session 之间的记忆层级示意。自下而上依次为：transcripts（可搜索的事件日志）、由 Claude 写下的 memory notes（记忆笔记）、memory representations（记忆表征，例如 wiki），以及被加载进每个 session 的 injected context（注入上下文）。在一个标注为 "Dreaming" 的方框内，箭头从 transcripts 指向每一层，并在相邻的上层各层之间双向连接。
 >
@@ -31,7 +31,7 @@ Agent 的记忆可以采用类似的分工。Agent 会把大量工作记录在�
 
 类似地，Claude 可以在一个 session 的日志中，把显著的事件在发生时打上标记，以便之后更容易找到；也可以[把它们写](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool)入一个记忆存储，比如一个存放记忆笔记的文件夹（图 2）。但 Claude 在当下、在它还不知道接下来会发生什么之前，如何判断什么才是显著的？
 
-![图 2：Claude 把显著观察直接写入 memory notes 层](Anthropic-Agent-Memory-图片/fig02-写入记忆笔记.webp)
+![图 2：Claude 把显著观察直接写入 memory notes 层](../../Anthropic-Agent-Memory-图片/fig02-写入记忆笔记.webp)
 
 > **图 2**：同一个记忆层级，其中 memory notes 这一层被高亮。一个箭头从 session 直接指向 memory notes，标注为"由 Claude 写下的显著观察"。
 >
@@ -49,7 +49,7 @@ Agent 的记忆可以采用类似的分工。Agent 会把大量工作记录在�
 
 不同模型在建立自己的学习闭环上达到了不同水平。Claude Sonnet 4.6 最多只做到"提出关于答案为何错误的猜想"这一步。它的记忆目录里散落着一些文件，每个文件都列着几条未经检验的猜测。
 
-![图 3：CL-Bench 数据库任务——左为有/无记忆的分数对比，右为 30 道题上的运行平均](Anthropic-Agent-Memory-图片/fig03-CL-Bench结果.webp)
+![图 3：CL-Bench 数据库任务——左为有/无记忆的分数对比，右为 30 道题上的运行平均](../../Anthropic-Agent-Memory-图片/fig03-CL-Bench结果.webp)
 
 > **图 3**：左图为 CL-Bench 数据库任务的平均奖励柱状图，对比无状态基线与使用记忆存储两种情况。Opus 5.5：0.655 → 0.838。Sonnet 5.5：0.644 → 0.833。Opus 5：0.564 → 0.828。Opus 4.7：0.383 → 0.700。Sonnet 5：0.306 → 0.610。Sonnet 4.6：0.330 → 0.364。右图为同样这些模型在 30 道题上的运行平均奖励折线图，比较有记忆与无记忆两种情况。
 >
@@ -69,7 +69,7 @@ Claude Opus 5 是这些模型中第一个真正闭上学习闭环的。它的多
 
 相比之下，Fable 5 只在两个文件夹里写了九个文件，外加一个名为 `global.md` 的顶层文件，并拿到了四个徽章。
 
-![图 4：Sonnet 3.7（413 文件/97.8 万字符）与 Fable 5（4.3 万字符）的记忆目录树图对比](Anthropic-Agent-Memory-图片/fig04-Pokemon记忆目录对比.webp)
+![图 4：Sonnet 3.7（413 文件/97.8 万字符）与 Fable 5（4.3 万字符）的记忆目录树图对比](../../Anthropic-Agent-Memory-图片/fig04-Pokemon记忆目录对比.webp)
 
 > **图 4**：两张同比例尺的 Pokémon 记忆目录树图（treemap），面积代表记忆的字符量。Claude Sonnet 3.7 的那张又大又拥挤，包含 413 个文件、977,930 个字符，分布在 locations、main、battles 以及几个 "consolidated" 文件夹下。Claude Fable 5 的那张很小，只有 10 个文件、43,406 个字符，分布在 locations、gameplay 和 `global.md` 中。
 >
@@ -89,7 +89,7 @@ Fable 5 据此组织了它的记忆。它的 `global.md` 文件充当一块仪�
 
 我们还测试了给模型关于"应该往记忆里写什么"的具体规则，每条规则对应一个测试。我们把每个模型在每条规则下从记忆中获得的增益，与没有该规则时的增益进行了对比。当我们把规则设为"只记录失败"时，Opus 5 和 Opus 4.7 从记忆中获得的性能提升都大幅缩水（图 5，右）。对更强的模型来说，让它们自由判断显著性比事先设定固定规则更有效，而这些规则可能最终削弱性能。
 
-![图 5：左为 Sonnet 4.6 在提示引导下的提升，右为“只记录失败”规则造成的增益损失](Anthropic-Agent-Memory-图片/fig05-引导与硬规则效果.webp)
+![图 5：左为 Sonnet 4.6 在提示引导下的提升，右为“只记录失败”规则造成的增益损失](../../Anthropic-Agent-Memory-图片/fig05-引导与硬规则效果.webp)
 
 > **图 5**：左图为 Sonnet 4.6 在 CL-Bench 数据库任务上的平均奖励柱状图：基线 0.330，使用记忆 0.364，使用记忆加改进后的指令 0.641。参考线标出 Opus 4.7 使用记忆的 0.700 与 Opus 5 使用记忆的 0.828。右图为被告知"只记录失败"后各模型记忆增益的变化量：Opus 5，−0.234；Opus 4.7，−0.150；Sonnet 4.6，−0.020。
 >
@@ -107,7 +107,7 @@ Fable 5 据此组织了它的记忆。它的 `global.md` 文件充当一块仪�
 
 Dreaming 给了 Claude 一种用原始 transcript 来检验其笔记的办法（图 6）。当 Claude 通过 Managed Agents、挂载一个目录作为其记忆来玩 Pokémon 时，我们看到了一个正面的例子。
 
-![图 6：dreaming 用 transcripts 校对并修正 notes](Anthropic-Agent-Memory-图片/fig06-dreaming纠错机制.webp)
+![图 6：dreaming 用 transcripts 校对并修正 notes](../../Anthropic-Agent-Memory-图片/fig06-dreaming纠错机制.webp)
 
 > **图 6**：带 dreaming 的记忆层级，高亮从 transcripts 层指向 memory notes 层的箭头，表示 dreaming 用 transcripts 来修正笔记。
 >
@@ -117,7 +117,7 @@ Dreaming 给了 Claude 一种用原始 transcript 来检验其笔记的办法（
 
 在某个时刻，Claude（错误地）记下了 PokéCenter 在东侧。当它走出 PokéCenter 时，它宣称"月见山在我身后了"，并更新了笔记："Mt Moon DONE（月见山完成）"。但月见山并不在它身后。几步动作之后，Claude 走过了那段台阶，落回了它来时的那条路线（图 7）。它的导航工具没有显示这次掉落，于是 Claude 得出结论："我往西走过头了"，并且认为自己一直就在正确的一侧。事实并非如此。
 
-![图 7：错误笔记 vs 经 dreaming 修正后的笔记，行动路线完全不同](Anthropic-Agent-Memory-图片/fig07-月见山错误笔记对比.webp)
+![图 7：错误笔记 vs 经 dreaming 修正后的笔记，行动路线完全不同](../../Anthropic-Agent-Memory-图片/fig07-月见山错误笔记对比.webp)
 
 > **图 7**：两张 Pokémon 地图面板，agent 位于台阶旁。左为"原始记忆"，其中存储的笔记是错误的：箭头显示 agent 朝下一个城镇前进。右为"记忆 + dreaming"，其中一次离线处理修正了笔记：箭头显示 agent 返回洞穴入口。
 >
@@ -127,7 +127,7 @@ Dreaming 给了 Claude 一种用原始 transcript 来检验其笔记的办法（
 
 在笔记未修正的那次运行中，Claude 三次掉回那条更早的路线。第三次失败后，Claude 似乎放弃了，写道："我打算停下来，而不是继续循环。"我们这个环境的自动回复指示它继续。于是它照做了，一路回到了尼比市（Pewter City）——山前面的那个城镇，它希望在那里治疗和补给。那次运行结束时，Claude 始终没有到达华蓝市。
 
-![图 8：三种配置在 3,000 个动作内向华蓝市推进的进度](Anthropic-Agent-Memory-图片/fig08-到达华蓝市进度.webp)
+![图 8：三种配置在 3,000 个动作内向华蓝市推进的进度](../../Anthropic-Agent-Memory-图片/fig08-到达华蓝市进度.webp)
 
 > **图 8**：折线图，显示在累计 3,000 个动作中向华蓝市推进的进度。记忆加 dreaming 的那次运行在第 1,935 个动作时到达华蓝市。原始记忆的那次运行掉下台阶并撤回尼比市。没有记忆的那次运行从未到达华蓝市。
 >
@@ -137,7 +137,7 @@ Dreaming 给了 Claude 一种用原始 transcript 来检验其笔记的办法（
 
 借助 dreaming，Claude 可以构建帮助它导航记忆的表征（图 9）。它使用的一类记忆表征叫做 [*wiki*](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)——即由 Claude 撰写和维护的一组页面，汇总 Claude 关于某一主题所知的内容，并把它与其它笔记链接起来。这些链接实际上为 Claude 提供了一张地图，它可以借此筛查自己的记忆，并在需要时高效地定位到相应记忆。
 
-![图 9：dreaming 从 transcripts 与 notes 构建记忆表征（wiki）](Anthropic-Agent-Memory-图片/fig09-dreaming建表征.webp)
+![图 9：dreaming 从 transcripts 与 notes 构建记忆表征（wiki）](../../Anthropic-Agent-Memory-图片/fig09-dreaming建表征.webp)
 
 > **图 9**：带 dreaming 的记忆层级，高亮从 transcripts 以及从 memory notes 指向记忆表征层（例如 wiki）的箭头。
 >
@@ -149,7 +149,7 @@ Dreaming 给了 Claude 一种用原始 transcript 来检验其笔记的办法（
 
 Claude 是逐步构建它的 wiki 的。在创建了初始 wiki 之后，它利用后续轮次的 dreaming 来补充、编辑或删减。在 dreaming 的早期轮次中，Claude 的知识就像一个新员工，仅凭 wiki 来回答问题的能力有限。它做得越多，它的知识地图就越丰富，就像一个经验丰富的老员工。在我们的测试中，我们发现，当我们同时也给 Claude 一个搜索工具时，wiki 对它的帮助最大。当它同时使用搜索和 wiki 时，随着 wiki 的增长，Claude 的综合得分从 54% 升到 61%，而只有搜索工具时则是 53%。当 Claude 仅用 wiki 来回答问题，其最佳得分为 48%。同时使用搜索和 wiki 还让每道题节省了约 20,000 个 token。
 
-![图 10：wiki 生成量与得分的关系，以及 wiki 在 2 个和 128 个 session 后的网络图](Anthropic-Agent-Memory-图片/fig10-wiki规模与得分.webp)
+![图 10：wiki 生成量与得分的关系，以及 wiki 在 2 个和 128 个 session 后的网络图](../../Anthropic-Agent-Memory-图片/fig10-wiki规模与得分.webp)
 
 > **图 10**：中间：折线图，显示随着 wiki 生成量从 2M 增长到 128M dreaming token，满足的评分标准比例如何变化。wiki 加搜索工具从 54% 升至 61%，仅 wiki 从 13% 升至 48%，只有搜索工具没有 wiki 时持平在 53%。左、右：一个示例 wiki 的网络图，2 个 session 后为 103 个页面、766 条链接，128 个 session 后为 222 个页面、12,893 条链接。
 >
@@ -159,7 +159,7 @@ Claude 是逐步构建它的 wiki 的。在创建了初始 wiki 之后，它利�
 
 我们指示 Claude 基于这些文档构建一个 wiki。然后我们要求 Claude 分别从 wiki 和从直接的文件搜索出发，来回答问题（关于那次并购）或生成法律简报（LAB 基准）。其中一个测试问了 24 个关于这次并购的问题（图 11，左），其中超过一半需要 Claude 跨多个文档查找信息，很多还需要 Claude 运用判断力或进行计算。在这些题目上（红色和橙色线条），Claude 查阅 wiki 时得分 87%，而仅用搜索时是 73%。
 
-![图 11：wiki 有收益（需跨文档综合）与无收益（单文档可检索）两类任务的对比](Anthropic-Agent-Memory-图片/fig11-任务类型与wiki收益.webp)
+![图 11：wiki 有收益（需跨文档综合）与无收益（单文档可检索）两类任务的对比](../../Anthropic-Agent-Memory-图片/fig11-任务类型与wiki收益.webp)
 
 > **图 11**：两张示意图，把评分标准与源文档关联起来。左：wiki 显示出更多收益的那项任务——24 条标准中的大多数都需要连接 10 个文档中的两个或更多，其中九条需要判断或算术。右：wiki 收益不那么明显的那项任务——57 条标准中的大多数都可以通过在单个文档（通常是交易概述备忘录）中进行文本搜索找到。
 >
@@ -167,7 +167,7 @@ Claude 是逐步构建它的 wiki 的。在创建了初始 wiki 之后，它利�
 
 在另一些情况下，wiki 用处较小。在一项 LAB 任务中（图 11，右），简报的各项标准常常可以通过对单个文档做文本搜索来检索到，wiki 相对于搜索在表现上没有明显增益。在另一项 LAB 任务中，wiki 长得比文档本身还大（图 12）。就像博尔赫斯那篇只有一段的短篇小说《论科学的精确性》里的制图师一样——他们绘制的地图精细到与它所代表的帝国一样大——Claude 做出了一个极其详尽的 wiki，而它实际上没有抽象出任何东西。
 
-![图 12：wiki 膨胀到源语料的 1.77 倍](Anthropic-Agent-Memory-图片/fig12-wiki比语料还大.webp)
+![图 12：wiki 膨胀到源语料的 1.77 倍](../../Anthropic-Agent-Memory-图片/fig12-wiki比语料还大.webp)
 
 > **图 12**：一个 wiki 的构建与第二轮处理示意图。左侧，一个圆圈代表语料：10 个文档、115 KB 文本。箭头指向一个更大的圆圈，代表由它构建出的 wiki：68 个页面、255 条链接、203 KB，是语料的 1.77 倍。wiki 中有一些页面没有任何链接。
 >
@@ -181,7 +181,7 @@ Dreaming 还可以把笔记浮升到记忆层级的顶端，而 agent 的 harnes
 
 [Claude Code 的 auto memory](https://code.claude.com/docs/en/memory) 也用同样的方式让它的注入层保持小，由 Claude 在 session 期间维护这个注入层。Claude 并不会把它的全部 auto memory 都加载进每个 session 的上下文窗口。它只加载 `MEMORY.md` 的前 200 行或 25 KB。这个头部充当一个索引，向 Claude 显示它知道什么、以及在哪里能找到。
 
-![图 13：dreaming 把少数笔记提升到注入上下文层](Anthropic-Agent-Memory-图片/fig13-dreaming写入注入层.webp)
+![图 13：dreaming 把少数笔记提升到注入上下文层](../../Anthropic-Agent-Memory-图片/fig13-dreaming写入注入层.webp)
 
 > **图 13**：带 dreaming 的记忆层级，高亮从 transcripts 以及从记忆表征指向顶端注入上下文层的箭头，该层供给下一个 session。
 >
@@ -195,7 +195,7 @@ Dreaming 还可以塑造记忆如何增长。比如，像 [Claude Duet](https://
 
 我们最开始使用的是生成 wiki 的基础指令，这些指令没有告诉 Claude *如何*使用 wiki。这项任务严重依赖合同条款。在 wiki 仍在构建的过程中，几个 agent 同时写入一张共享的合同条款表（图 14，左）。
 
-![图 14：多 agent 写同一页导致事实丢失（41/57）vs 一页一 writer（57/57）](Anthropic-Agent-Memory-图片/fig14-合同条款写冲突.webp)
+![图 14：多 agent 写同一页导致事实丢失（41/57）vs 一页一 writer（57/57）](../../Anthropic-Agent-Memory-图片/fig14-合同条款写冲突.webp)
 
 > **图 14**：两张示意图。之前：四个 agent 写入同一个共享页面 `provisions.md`，其中一个 agent 的保存擦掉了另一个 agent 写入的行；57 条受评事实中有 41 条存活。之后：四个 agent 各自写入自己那份合同的页面，条款逐字照抄；57 条受评事实全部 57 条存活。
 >
@@ -213,7 +213,7 @@ Dreaming 还可以塑造记忆如何增长。比如，像 [Claude Duet](https://
 
 在为 LAB 基准构建 wiki 时（例如图 14 所示），Claude 有时会链接到尚未创建的页面。第二轮 dreaming 处理补上了许多这样的缺口。在其中一项任务中（图 15），dreaming 发现 wiki 中有九条链接指向一个缺失的页面，并把它们重新指向同一文档的既有页面。它还新增了三个页面（其中包括一个索引）来改进这个 wiki。
 
-![图 15：第二轮 dreaming 处理前后的 wiki 网络图](Anthropic-Agent-Memory-图片/fig15-第二轮dreaming补漏.webp)
+![图 15：第二轮 dreaming 处理前后的 wiki 网络图](../../Anthropic-Agent-Memory-图片/fig15-第二轮dreaming补漏.webp)
 
 > **图 15**：一个 wiki 的两张网络图。第二轮处理之前：38 个条目、225 条链接，其中有来自六个页面的九条链接指向一个并不存在的页面 `escrow-agreement`。之后：41 个条目、278 条链接，那九条链接全部指向 `buyer-form-escrow-agreement`，并新增了三个页面：index、instructions email 和 escalations。
 >

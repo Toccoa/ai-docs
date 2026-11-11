@@ -84,7 +84,11 @@ export default defineConfig({
 
   themeConfig: {
     outline: { level: [2, 3], label: '本页目录' },
-    nav: [{ text: '首页', link: '/' }],
+    nav: [
+      { text: '首页', link: '/' },
+      { text: 'RAG 学习路线图', link: '/RAG 学习路线图/' },
+      { text: '每日精选', link: '/每日 AI Agent 技术精选/' },
+    ],
     sidebar: buildSidebar(),
     search: { provider: 'local' },
     docFooter: { prev: '上一篇', next: '下一篇' },

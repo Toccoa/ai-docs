@@ -57,7 +57,7 @@
 
 看第一张图就明白了：
 
-![图 1：单轮评测 vs agent 评测](图片/demystifying-evals/fig01-单轮与多轮评测.webp)
+![图 1：单轮评测 vs agent 评测](../../图片/demystifying-evals/fig01-单轮与多轮评测.webp)
 
 上半格是单轮：Prompt + Data → LLM → Response → `response == 18`。评分对象就是那个字符串。
 
@@ -77,7 +77,7 @@
 
 ## 3. 评测的解剖图：一张图看清所有零件
 
-![图 2：agent 评测的组件构成](图片/demystifying-evals/fig02-评测组件构成.webp)
+![图 2：agent 评测的组件构成](../../图片/demystifying-evals/fig02-评测组件构成.webp)
 
 这张图的嵌套关系值得单独拆：
 
@@ -186,7 +186,7 @@ Evaluation harness
 
 ## 7. 非确定性：pass@k vs pass^k，全文最锋利的一刀
 
-![图 3：pass@k 与 pass^k 的分叉](图片/demystifying-evals/fig03-pass@k与pass^k分叉.webp)
+![图 3：pass@k 与 pass^k 的分叉](../../图片/demystifying-evals/fig03-pass@k与pass^k分叉.webp)
 
 这张图的视觉冲击力很强，但真正的信息量在**读法**上。
 
@@ -239,7 +239,7 @@ pass^k 的下降是**指数式**的。单次 90% 听起来很好——k=10 时 p
 
 ## 8. 从 0 到 1：九步路线图（0–8）
 
-![图 4：通往优秀评测的路线图](图片/demystifying-evals/fig04-有效评测的构建流程.webp)
+![图 4：通往优秀评测的路线图](../../图片/demystifying-evals/fig04-有效评测的构建流程.webp)
 
 图分三栏，但真正的结构是**三种工作、九个小步**。下面逐步讲，重点放在"这一步为什么难"。
 
@@ -399,7 +399,7 @@ Qodo 的例子是这条的最佳注脚：他们起初**对 Opus 4.5 印象不佳
 
 ## 10. 瑞士奶酪：评测不是一个东西，是五层
 
-![图 5：质量的瑞士奶酪](图片/demystifying-evals/fig05-瑞士奶酪模型.webp)
+![图 5：质量的瑞士奶酪](../../图片/demystifying-evals/fig05-瑞士奶酪模型.webp)
 
 文章借了安全工程的**瑞士奶酪模型**：每层都有孔洞，但孔洞位置不同，多层叠起来就能挡住漏过去的东西。
 
@@ -425,7 +425,7 @@ Qodo 的例子是这条的最佳注脚：他们起初**对 Opus 4.5 印象不佳
 
 ## 11. 与 LangChain《Eval-Driven Development》对照：它补上了什么
 
-我们此前精讲过 LangChain 的 [深度精讲-LangChain-Eval-Driven-Development.md](深度精讲-LangChain-Eval-Driven-Development.md)，那篇当时被批"对、但只讲了一半"，四条缺口是：**成本账缺失、数据集策展无答案、爬山法的局部最优、评测即方向的双刃**。
+我们此前精讲过 LangChain 的 [深度精讲-LangChain-Eval-Driven-Development.md](../2026-11-10/深度精讲-LangChain-Eval-Driven-Development.md)，那篇当时被批"对、但只讲了一半"，四条缺口是：**成本账缺失、数据集策展无答案、爬山法的局部最优、评测即方向的双刃**。
 
 现在拿 Anthropic 这篇去填，逐条看：
 
@@ -443,7 +443,7 @@ Qodo 的例子是这条的最佳注脚：他们起初**对 Opus 4.5 印象不佳
 1. **成本依然没有绝对数字。** 整篇没有一句"跑一次全量评测大概多少钱/多久"。对于一个要说服老板批预算的团队，这篇帮你论证"该做"，不帮你算"做多少"。
 2. **统计显著性没展开。** pass@k / pass^k 给了公式直觉，但"N 个任务 × k 个试次，两个版本差多少才算真的差"这个问题没答。20–50 个任务的套件上，5 个百分点的差异大概率是噪声。
 3. **多 agent 系统的评测几乎没写。** 只在结论里一句"随着 agent 在 multi-agent 系统中协作，我们需要调整技术"。而这是 2026 年最需要答案的地方。
-4. **长任务（小时/天级）的评测没写。** 编码、研究、computer use 都是一次会话内能跑完的。跨 session、跨天、需要中途人工介入的任务，怎么算 trial、怎么算 outcome，这篇没有答案——而这恰恰是 harness 那篇文章（[深度精讲-LangChain-Agents-Are-Going-Async.md](深度精讲-LangChain-Agents-Are-Going-Async.md)）和记忆那篇文章的地盘。
+4. **长任务（小时/天级）的评测没写。** 编码、研究、computer use 都是一次会话内能跑完的。跨 session、跨天、需要中途人工介入的任务，怎么算 trial、怎么算 outcome，这篇没有答案——而这恰恰是 harness 那篇文章（[深度精讲-LangChain-Agents-Are-Going-Async.md](../2026-11-10/深度精讲-LangChain-Agents-Are-Going-Async.md)）和记忆那篇文章的地盘。
 
 ### 三篇连起来读，是一条完整的线
 
@@ -511,8 +511,8 @@ Qodo 的例子是这条的最佳注脚：他们起初**对 Opus 4.5 印象不佳
 | [原文翻译-Demystifying-Evals-for-AI-Agents.md](原文翻译-Demystifying-Evals-for-AI-Agents.md) | 全文逐段中译，保留七节结构、两张 YAML、三张评分器表、方法对照大表、附录框架清单 |
 | `图片/demystifying-evals/` | 5 张官方原图（4584px 宽，cdn.sanity.io 原图） |
 | `图片/demystifying-evals/list.txt` | 「本地文件名 ↔ CDN hash 名」映射，用于重下 |
-| [深度精讲-LangChain-Eval-Driven-Development.md](深度精讲-LangChain-Eval-Driven-Development.md) | 对照读物：EDD 三步法与四条批评（本文第 11 节逐条对账） |
-| [深度精讲-LangChain-Agents-Are-Going-Async.md](深度精讲-LangChain-Agents-Are-Going-Async.md) | 对照读物：异步 agent 的任务台账与 trace |
+| [深度精讲-LangChain-Eval-Driven-Development.md](../2026-11-10/深度精讲-LangChain-Eval-Driven-Development.md) | 对照读物：EDD 三步法与四条批评（本文第 11 节逐条对账） |
+| [深度精讲-LangChain-Agents-Are-Going-Async.md](../2026-11-10/深度精讲-LangChain-Agents-Are-Going-Async.md) | 对照读物：异步 agent 的任务台账与 trace |
 
 ### 5 张图与原文章节的对应
 

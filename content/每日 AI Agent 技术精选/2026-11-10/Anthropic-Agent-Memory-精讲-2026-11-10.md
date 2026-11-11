@@ -60,7 +60,7 @@ Kierkegaard：生活只能倒着理解，却必须正着过。记忆设计撞的
         └──── Dreaming ──────┘  离线跑，可向上搬运任意层
 ```
 
-![图 1：四层记忆栈与旁边的 dreaming 循环（Anthropic 原文配图）](Anthropic-Agent-Memory-图片/fig01-记忆层级总览.webp)
+![图 1：四层记忆栈与旁边的 dreaming 循环（Anthropic 原文配图）](../../Anthropic-Agent-Memory-图片/fig01-记忆层级总览.webp)
 | 层 | 是什么 | 谁写 | 决定性约束 |
 |---|---|---|---|
 | **L1 Transcripts** | session 记录、日志 | 系统自动 | 唯一不可篡改的事实源；dreaming 用它校对上面所有层 |
@@ -82,7 +82,7 @@ Kierkegaard：生活只能倒着理解，却必须正着过。记忆设计撞的
 理论来源：Letta & UC Berkeley 的 **sleep-time compute**（arXiv 2504.13171）——在交互间隙用闲置算力重整已有 context。生物学类比：海马体在睡眠中回放近期经验，逐步蒸馏进新皮层。
 
 ### 4.1 纠错（correct）
-![图 7：左边是错误笔记，右边是 dreaming 修正后的笔记——同一张地图，完全不同的行动](Anthropic-Agent-Memory-图片/fig07-月见山错误笔记对比.webp)
+![图 7：左边是错误笔记，右边是 dreaming 修正后的笔记——同一张地图，完全不同的行动](../../Anthropic-Agent-Memory-图片/fig07-月见山错误笔记对比.webp)
 **案例：Pokémon 的月见山陷阱。** 洞穴入口在西、出口在东，入口附近有个单向台阶会把你摔回原路。Claude 用入口旁的 PokéCenter 当地标，却（错误地）记成"PokéCenter 在东侧"，走出门就宣布"Mt Moon 已经过了"，几步后掉下台阶；导航工具没显示掉落，于是它推断"我走过头往西了"，其实一直在错的一侧。
 
 - **无纠错**：掉了三次台阶，写下"我不想再循环，我停下了"，最终退回 Pewter City，**从未到 Cerulean**。
@@ -92,7 +92,7 @@ Kierkegaard：生活只能倒着理解，却必须正着过。记忆设计撞的
 > 关键洞察：**transcript 给了 memory 一个可以校验的 ground truth。没有它，"纠错"就退化成两个摘要互相点头。**
 
 ### 4.2 建表征（represent）
-![图 10：wiki 生成量（2M→128M dreaming token）与得分；左右为 2 个和 128 个 session 后的 wiki 网络图](Anthropic-Agent-Memory-图片/fig10-wiki规模与得分.webp)
+![图 10：wiki 生成量（2M→128M dreaming token）与得分；左右为 2 个和 128 个 session 后的 wiki 网络图](../../Anthropic-Agent-Memory-图片/fig10-wiki规模与得分.webp)
 **实验：Stainless 语料**（Anthropic 2026-05 收购的公司）——约 **35 万个文件、约 4.2 亿 token**。25 道题，给一个搜索工具，再让 Opus 5 agent 用 dreaming 建 wiki（128 个 session，写/改/合并重复/对源文件核验主张）。
 
 | 配置 | 分数 |
@@ -110,7 +110,7 @@ wiki 规模：2 个 session 后 103 页 / 766 条链接；128 个 session 后 22
 **代价对称地清楚**：吃 token + 一条错笔记污染所有 session。所以晋升要当**发布流程**来做。
 
 ### 4.4 聚焦（focus）
-![图 14：左——四个 agent 同写 provisions.md 互相覆盖，只活下 41/57 条；右——一页一 writer 且逐字引用，57/57](Anthropic-Agent-Memory-图片/fig14-合同条款写冲突.webp)
+![图 14：左——四个 agent 同写 provisions.md 互相覆盖，只活下 41/57 条；右——一页一 writer 且逐字引用，57/57](../../Anthropic-Agent-Memory-图片/fig14-合同条款写冲突.webp)
 同样语料 + 不同指令 = 不同 wiki。**合同审查任务**的教训最硬：
 
 - 初版指令没告诉 Claude"合同条款是最重要的"，几个 agent 同时往一张共享的 `provisions.md` 写，互相覆盖 → 简报只覆盖 **41/57 个受评事实（72%）**。
@@ -125,7 +125,7 @@ wiki 规模：2 个 session 后 103 页 / 766 条链接；128 个 session 后 22
 
 ## 5. 关键数字：CL-Bench 1.0（学习闭环）
 
-![图 3：左为各模型有/无记忆的得分，右为 30 道题上的运行平均曲线](Anthropic-Agent-Memory-图片/fig03-CL-Bench结果.webp)
+![图 3：左为各模型有/无记忆的得分，右为 30 道题上的运行平均曲线](../../Anthropic-Agent-Memory-图片/fig03-CL-Bench结果.webp)
 任务：连续回答数据库查询题，每题答完会被告知正确答案，并可写记忆帮助未来。
 设置：每题一个全新 session，唯一跨 session 的东西是持久化的 memory 目录（Claude Managed Agents）。
 
@@ -156,7 +156,7 @@ wiki 规模：2 个 session 后 103 页 / 766 条链接；128 个 session 后 22
 
 然后他们逐条测试"规定该记什么"，每条规则一个实验。结果：
 
-![图 5：右图是告诉模型“只记失败”后各模型的增益变化（Opus 5 掉 0.234）；左图是 Sonnet 4.6 被提示引导后从 0.364 升到 0.641](Anthropic-Agent-Memory-图片/fig05-引导与硬规则效果.webp)
+![图 5：右图是告诉模型“只记失败”后各模型的增益变化（Opus 5 掉 0.234）；左图是 Sonnet 4.6 被提示引导后从 0.364 升到 0.641](../../Anthropic-Agent-Memory-图片/fig05-引导与硬规则效果.webp)
 **规则"只记录失败"（record only failures）让记忆的增益崩掉：**
 
 | 模型 | 增益变化 |
@@ -176,7 +176,7 @@ wiki 规模：2 个 session 后 103 页 / 766 条链接；128 个 session 后 22
 
 ## 7. 第二个关键结论：判断力比容量重要（Pokémon 对照）
 
-![图 4：同比例尺的树图，面积＝字符量。左边 413 个文件 97.8 万字符拿 1 个徽章，右边 4.3 万字符拿 4 个徽章](Anthropic-Agent-Memory-图片/fig04-Pokemon记忆目录对比.webp)
+![图 4：同比例尺的树图，面积＝字符量。左边 413 个文件 97.8 万字符拿 1 个徽章，右边 4.3 万字符拿 4 个徽章](../../Anthropic-Agent-Memory-图片/fig04-Pokemon记忆目录对比.webp)
 同一起点、同样步数（约 10,000 步）时的记忆文件夹：
 
 | | Sonnet 3.7 | Fable 5 |
@@ -205,7 +205,7 @@ Opus 5.5 用类似策略（小文件夹、只跟踪当前目标和下一步、�
 
 ## 8. 表征不是万灵药（三个反例）
 
-![图 12：10 个文档 115KB，建出的 wiki 却 68 页/255 链接/203KB，是语料的 1.77 倍](Anthropic-Agent-Memory-图片/fig12-wiki比语料还大.webp)
+![图 12：10 个文档 115KB，建出的 wiki 却 68 页/255 链接/203KB，是语料的 1.77 倍](../../Anthropic-Agent-Memory-图片/fig12-wiki比语料还大.webp)
 同一套 Harvey LAB 基准 + 并购文件，wiki 的表现分三种情况：
 
 | 情况 | 结论 |

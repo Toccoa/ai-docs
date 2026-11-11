@@ -25,7 +25,7 @@
 
 在最简单的评测里，agent 处理一个提示，评分器（grader）检查输出是否符合预期。而在更复杂的多轮评测里，一个编码 agent 会拿到工具、一个任务（这里是"构建一个 MCP server"）和一个环境，执行"agent 循环"（工具调用加推理），并把实现写进环境；然后评分用单元测试（unit tests）验证这个 MCP server 是不是真的能跑。
 
-![图 1：单轮评测 vs agent 评测。上：Prompt + Data 进 LLM，出 Response，评分逻辑是 `response == 18`。下：Tools + Environment + Task 进 Agent，agent 反复 read_file / web_search / edit_file / bash(pytest)，每次动作后环境被更新，最后评分逻辑是"跑一堆测试，确认 MCP server 真的能工作"。注意 agent 会自己喊 `I did it!`——而这句声明本身不是证据](图片/demystifying-evals/fig01-单轮与多轮评测.webp)
+![图 1：单轮评测 vs agent 评测。上：Prompt + Data 进 LLM，出 Response，评分逻辑是 `response == 18`。下：Tools + Environment + Task 进 Agent，agent 反复 read_file / web_search / edit_file / bash(pytest)，每次动作后环境被更新，最后评分逻辑是"跑一堆测试，确认 MCP server 真的能工作"。注意 agent 会自己喊 `I did it!`——而这句声明本身不是证据](../../图片/demystifying-evals/fig01-单轮与多轮评测.webp)
 
 > **图注（原文）**：在最简单的评测里，agent 处理一个提示，评分器检查输出是否符合预期。而在更复杂的多轮评测里，一个编码 agent 会拿到工具、一个任务（此处为构建一个 MCP server）和一个环境，执行"agent 循环"（工具调用加推理），并把实现写进环境；然后评分用单元测试验证这个 MCP server 是不是真的能工作。
 
@@ -42,7 +42,7 @@
 - **agent harness（也叫脚手架 scaffold）** 是让模型能作为一个 agent 行动的系统：它处理输入、编排工具调用、返回结果。当我们评测"一个 agent"时，我们评测的是 **harness 和模型一起工作**的结果。举例来说，[Claude Code](https://claude.com/product/claude-code) 是一个灵活的 agent harness，而我们通过 [Agent SDK](https://platform.claude.com/docs/en/agent-sdk/overview) 使用它的核心原语，构建了我们自己的[长时运行 agent harness](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents)。
 - **评测套件（evaluation suite）** 是一组任务，用来测量特定的能力或行为。一个套件里的任务通常共享一个宽泛的目标。比如一个客服评测套件可能测退款、取消、升级工单。
 
-![图 2：agent 评测的组件构成。最外层是 Evaluation harness，里面是 Evaluation suite，套件里装多个 Task；每个 Task 有评分器（deterministic_tests / llm_rubric / state_check / tool_calls）、被追踪的指标（n_turns / n_toolcalls / tokens / latency）、以及多个 Trials（每个 trial 内含 trajectory：messages、tool_calls、reasoning…）。Task 之下产出 Outcome（环境的最终状态），再进 Grader evaluate（trajectory + outcome → 分数）。右侧与 Agent harness 双向箭头——评测的对象是 harness 与模型的合体](图片/demystifying-evals/fig02-评测组件构成.webp)
+![图 2：agent 评测的组件构成。最外层是 Evaluation harness，里面是 Evaluation suite，套件里装多个 Task；每个 Task 有评分器（deterministic_tests / llm_rubric / state_check / tool_calls）、被追踪的指标（n_turns / n_toolcalls / tokens / latency）、以及多个 Trials（每个 trial 内含 trajectory：messages、tool_calls、reasoning…）。Task 之下产出 Outcome（环境的最终状态），再进 Grader evaluate（trajectory + outcome → 分数）。右侧与 Agent harness 双向箭头——评测的对象是 harness 与模型的合体](../../图片/demystifying-evals/fig02-评测组件构成.webp)
 
 > **图注（原文）**：agent 评测的组件构成。
 
@@ -220,7 +220,7 @@ Computer use agent 通过与人相同的界面与软件交互——截图、鼠�
 
 两个指标都有用，用哪个取决于产品要求：**一次成功就够的工具用 pass@k，一致性至关重要的 agent 用 pass^k。**
 
-![图 3：pass@k 与 pass^k 的分叉。横轴是试次数量 k（1–10），纵轴是成功率。单次成功率 75% 时：pass@k（绿）随 k 上升并趋近 100%（k=3 时 97%）；pass^k（橙）随 k 下降并趋近 0%（k=3 时 39%）。图中标注 pass@k = "k 次里至少一次成功"，pass^k = "k 次必须全部成功"](图片/demystifying-evals/fig03-pass@k与pass^k分叉.webp)
+![图 3：pass@k 与 pass^k 的分叉。横轴是试次数量 k（1–10），纵轴是成功率。单次成功率 75% 时：pass@k（绿）随 k 上升并趋近 100%（k=3 时 97%）；pass^k（橙）随 k 下降并趋近 0%（k=3 时 39%）。图中标注 pass@k = "k 次里至少一次成功"，pass^k = "k 次必须全部成功"](../../图片/demystifying-evals/fig03-pass@k与pass^k分叉.webp)
 
 > **图注（原文）**：pass@k 与 pass^k 随试次增加而分叉。在 k=1 时两者相同（都等于单次成功率）。到 k=10，它们讲相反的故事：pass@k 趋近 100%，pass^k 跌向 0%。
 
@@ -228,7 +228,7 @@ Computer use agent 通过与人相同的界面与软件交互——截图、鼠�
 
 这一节给出我们实战中检验过的建议，帮你从"没有评测"走到"可以信任的评测"。把它当作评测驱动式 agent 开发的路线图：**尽早定义成功、清晰地度量它、持续迭代。**
 
-![图 4：通往优秀评测的路线图，分三栏。左栏 Evaluation suite development：0. 现在就开始、尽早开始 → 1. 从你已经在手工测的东西开始 → 2. 写出无歧义的任务 → 3. 覆盖正反两类用例。中栏 Harness development：4. 构建稳健的评测 harness → 5. 审慎设计评分器。右栏 Eval maintenance：6. 检查完整记录 → 7. 监控能力评测是否饱和 → 8. 长期维护套件](图片/demystifying-evals/fig04-有效评测的构建流程.webp)
+![图 4：通往优秀评测的路线图，分三栏。左栏 Evaluation suite development：0. 现在就开始、尽早开始 → 1. 从你已经在手工测的东西开始 → 2. 写出无歧义的任务 → 3. 覆盖正反两类用例。中栏 Harness development：4. 构建稳健的评测 harness → 5. 审慎设计评分器。右栏 Eval maintenance：6. 检查完整记录 → 7. 监控能力评测是否饱和 → 8. 长期维护套件](../../图片/demystifying-evals/fig04-有效评测的构建流程.webp)
 
 ### 收集初始评测数据集的任务
 
@@ -319,7 +319,7 @@ Computer use agent 通过与人相同的界面与软件交互——截图、鼠�
 
 最有效的团队会组合这些方法：**用自动化评测做快速迭代，用生产监控拿真实基准，用定期人工评审做校准。**
 
-![图 5：质量的瑞士奶酪。三层半透明的奶酪叠在一起，每一层的"孔洞"位置不同；一条红色箭线从左上射入，在第一层被挡住、在第二层穿过孔洞、最终在第三层的一个孔洞里穿出（画了红叉）。右侧标注三层分别对应：自动化评测（提供一致的度量、建立基线、部署前捕捉回退）；人工完整记录评审 / 早期体验计划（捕捉细微失败和意外的用户或 agent 行为）；生产监控 / A/B 测试 / 用户反馈（在规模上暴露罕见的边缘情况和真实使用模式）](图片/demystifying-evals/fig05-瑞士奶酪模型.webp)
+![图 5：质量的瑞士奶酪。三层半透明的奶酪叠在一起，每一层的"孔洞"位置不同；一条红色箭线从左上射入，在第一层被挡住、在第二层穿过孔洞、最终在第三层的一个孔洞里穿出（画了红叉）。右侧标注三层分别对应：自动化评测（提供一致的度量、建立基线、部署前捕捉回退）；人工完整记录评审 / 早期体验计划（捕捉细微失败和意外的用户或 agent 行为）；生产监控 / A/B 测试 / 用户反馈（在规模上暴露罕见的边缘情况和真实使用模式）](../../图片/demystifying-evals/fig05-瑞士奶酪模型.webp)
 
 > **图注（原文）**：就像安全工程里的瑞士奶酪模型，没有任何单一评测层能抓住所有问题。多层方法组合起来，从一层漏过去的失败会被另一层接住。
 

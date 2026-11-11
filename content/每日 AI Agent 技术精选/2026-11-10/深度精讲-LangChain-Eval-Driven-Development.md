@@ -106,7 +106,7 @@
 - 病根在 **工具描述**：`"Files an IT support ticket. Use for VPN and laptop issues."`——**它把"VPN"当成了触发词，而用户的问题里恰好也有"VPN"**。
 - 修复：把描述收窄到"需要 IT 出手的请求"→ 8/8。
 
-![对比实验：baseline 与带工单工具的两个实验并排，第 4 条从绿变红](图片/eval-driven-development/edd-docs-agent-comparison.webp)
+![对比实验：baseline 与带工单工具的两个实验并排，第 4 条从绿变红](../../图片/eval-driven-development/edd-docs-agent-comparison.webp)
 
 这个案例值得反复讲，因为它同时展示了三件事：
 
