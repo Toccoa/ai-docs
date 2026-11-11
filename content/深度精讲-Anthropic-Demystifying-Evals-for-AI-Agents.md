@@ -57,7 +57,7 @@
 
 看第一张图就明白了：
 
-![图 1：单轮评测 vs agent 评测](图片/demystifying-evals/fig01-单轮与多轮评测.png)
+![图 1：单轮评测 vs agent 评测](图片/demystifying-evals/fig01-单轮与多轮评测.webp)
 
 上半格是单轮：Prompt + Data → LLM → Response → `response == 18`。评分对象就是那个字符串。
 
@@ -77,7 +77,7 @@
 
 ## 3. 评测的解剖图：一张图看清所有零件
 
-![图 2：agent 评测的组件构成](图片/demystifying-evals/fig02-评测组件构成.png)
+![图 2：agent 评测的组件构成](图片/demystifying-evals/fig02-评测组件构成.webp)
 
 这张图的嵌套关系值得单独拆：
 
@@ -186,7 +186,7 @@ Evaluation harness
 
 ## 7. 非确定性：pass@k vs pass^k，全文最锋利的一刀
 
-![图 3：pass@k 与 pass^k 的分叉](图片/demystifying-evals/fig03-pass@k与pass^k分叉.png)
+![图 3：pass@k 与 pass^k 的分叉](图片/demystifying-evals/fig03-pass@k与pass^k分叉.webp)
 
 这张图的视觉冲击力很强，但真正的信息量在**读法**上。
 
@@ -239,7 +239,7 @@ pass^k 的下降是**指数式**的。单次 90% 听起来很好——k=10 时 p
 
 ## 8. 从 0 到 1：九步路线图（0–8）
 
-![图 4：通往优秀评测的路线图](图片/demystifying-evals/fig04-有效评测的构建流程.png)
+![图 4：通往优秀评测的路线图](图片/demystifying-evals/fig04-有效评测的构建流程.webp)
 
 图分三栏，但真正的结构是**三种工作、九个小步**。下面逐步讲，重点放在"这一步为什么难"。
 
@@ -399,7 +399,7 @@ Qodo 的例子是这条的最佳注脚：他们起初**对 Opus 4.5 印象不佳
 
 ## 10. 瑞士奶酪：评测不是一个东西，是五层
 
-![图 5：质量的瑞士奶酪](图片/demystifying-evals/fig05-瑞士奶酪模型.png)
+![图 5：质量的瑞士奶酪](图片/demystifying-evals/fig05-瑞士奶酪模型.webp)
 
 文章借了安全工程的**瑞士奶酪模型**：每层都有孔洞，但孔洞位置不同，多层叠起来就能挡住漏过去的东西。
 

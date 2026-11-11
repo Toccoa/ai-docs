@@ -62,7 +62,7 @@ EDD **一次只处理一个行为**。这样你就有了一个很窄的靶子可
 
 我们会**按照这几条来评测，即使 agent 目前还没有这个能力**。
 
-![示例：一个内部文档 agent，两个现有工具加一个计划中的工单工具，每个工具配一个会触发它的示例输入](图片/eval-driven-development/edd-docs-agent-tool-routing.png)
+![示例：一个内部文档 agent，两个现有工具加一个计划中的工单工具，每个工具配一个会触发它的示例输入](图片/eval-driven-development/edd-docs-agent-tool-routing.webp)
 
 *图注：当前文档 agent 的示例实现，以及我们计划新增的工单工具。每个工具都配了一个会触发它的示例输入。*
 
@@ -72,7 +72,7 @@ EDD **一次只处理一个行为**。这样你就有了一个很窄的靶子可
 
 对我们的文档 agent 来说，**少量样例就足够起步**。在数据集里，我们会放入工单类请求，再加上那些仍应交给 `search_docs` 和 `web_search` 的问题，以便把现有行为也一并纳入考量。
 
-![数据集 docs-agent-tool-routing：8 条输入各配一个参考输出 tool](图片/eval-driven-development/edd-docs-agent-dataset.png)
+![数据集 docs-agent-tool-routing：8 条输入各配一个参考输出 tool](图片/eval-driven-development/edd-docs-agent-dataset.webp)
 
 *图注：每个 example 把一条输入问题与参考输出（agent 应该调用的工具）配对。*
 
@@ -80,7 +80,7 @@ EDD **一次只处理一个行为**。这样你就有了一个很窄的靶子可
 
 **写一个评测器（evaluator）。** 有了数据集之后，你就可以把 PRD 里对「好」的定义变成测试或评测，用它给 agent 在你的样例上的表现打分。写评测器时，要选择最适合你这个测试的**打分方式**：当检查是**确定性的**，用**代码评测（code eval）**；当不是，用 **LLM-as-a-judge**。你还要决定：要看 agent 的**最终回答**，还是看它为了走到那一步所**执行的某个动作**，或者别的什么东西？对我们的文档 agent 来说，我们要看它**调用了哪些工具**，以确认它在每种情况下都用对了工具。工具选择很容易用代码检查，所以我们用一个**代码评测**来检查每条样例是否调用了其参考输出所写的工具。
 
-![评测器示例：输入 → agent 实际调用 → 与参考输出比较 → Pass 1 / Fail 0](图片/eval-driven-development/edd-docs-agent-evaluator.png)
+![评测器示例：输入 → agent 实际调用 → 与参考输出比较 → Pass 1 / Fail 0](图片/eval-driven-development/edd-docs-agent-evaluator.webp)
 
 *图注：只要 agent 调用了其参考输出里的那个工具，该样例就算通过。*
 
@@ -100,7 +100,7 @@ EDD **一次只处理一个行为**。这样你就有了一个很窄的靶子可
 
 做实验对比时，重要的是不仅要关注**平均分的变化**，还要关注**任何回退**，以及**对已有可用行为的覆盖**。在我们的文档 agent 上，工单类样例现在通过了。但是「我要怎么连上 VPN？」现在会**发工单**，而不是去查文档。**平均分涨了，但有一个用例坏了。**
 
-![对比实验：baseline 0.63 vs 带工单工具 0.88，其中第 4 条从通过变为失败](图片/eval-driven-development/edd-docs-agent-comparison.png)
+![对比实验：baseline 0.63 vs 带工单工具 0.88，其中第 4 条从通过变为失败](图片/eval-driven-development/edd-docs-agent-comparison.webp)
 
 *图注：加上工单工具提高了平均分，但「我要怎么连上 VPN？」现在失败了。*
 
@@ -108,13 +108,13 @@ EDD **一次只处理一个行为**。这样你就有了一个很窄的靶子可
 
 当我们打开最新实验里那条失败的 trace，我们看到：工具描述里写着用 `create_ticket` 处理「VPN and laptop issues（VPN 与笔记本问题）」，于是**任何提到 VPN 的问题都会匹配**。这就覆盖掉了基线上原本良好的行为。
 
-![失败的 trace：create_ticket 的工具描述是 "Files an IT support ticket. Use for VPN and laptop issues."，判断为过宽](图片/eval-driven-development/edd-docs-agent-trace.png)
+![失败的 trace：create_ticket 的工具描述是 "Files an IT support ticket. Use for VPN and laptop issues."，判断为过宽](图片/eval-driven-development/edd-docs-agent-trace.webp)
 
 *图注：trace 告诉我们，工具描述太宽泛，于是 agent 为一个文档本可回答的问题发了工单。*
 
 解决方案是**把工具描述收窄**到「需要 IT 出手」的请求。实现这个改动后，我们再次运行评测。现在，**每一个样例都通过了**。
 
-![三次实验的演进：baseline 5/8 (0.63) → ticketing-tool 7/8 (0.88) → tighter-tool-description 8/8 (1.00)](图片/eval-driven-development/edd-docs-agent-experiments.png)
+![三次实验的演进：baseline 5/8 (0.63) → ticketing-tool 7/8 (0.88) → tighter-tool-description 8/8 (1.00)](图片/eval-driven-development/edd-docs-agent-experiments.webp)
 
 *图注：更严格的工具描述让每一个样例都通过。*
 

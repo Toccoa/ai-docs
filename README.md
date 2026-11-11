@@ -28,10 +28,13 @@ npm run docs:build   # 产物在 site/.vitepress/dist
 ## 发布一篇文章
 
 ```bash
-node scripts/publish.mjs "深度精讲-xxx.md"   # 单篇，连图片一起复制
+node scripts/publish.mjs "深度精讲-xxx.md"   # 单篇，连图片一起复制并转 WebP
 node scripts/publish.mjs --all              # 把能发的全发一遍
+npm run images                             # 单独把 content/ 里的图转一遍（可选）
 git add content/ && git commit -m "add: xxx" && git push
 ```
+
+图片会被转成 WebP（最长边 2400px、质量 88）再进 `content/`，原始 png 保持不动。实测 26 张图 8.6 MB → 2.7 MB。
 
 推送到 `main` 后，GitHub Actions 会自动构建并部署。
 

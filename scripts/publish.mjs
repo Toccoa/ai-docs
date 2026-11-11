@@ -17,6 +17,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { convert, rewriteRefs } from './optimize-images.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const CONTENT = path.join(ROOT, 'content')
@@ -67,9 +68,9 @@ function docLinks(text) {
   return [...refs]
 }
 
-const stats = { md: 0, img: 0, footnote: 0, missingImg: [], grayLinks: [], skipped: [] }
+const stats = { md: 0, img: 0, webp: 0, bytesBefore: 0, bytesAfter: 0, footnote: 0, missingImg: [], grayLinks: [], skipped: [] }
 
-function publish(src) {
+async function publish(src) {
   const relPath = rel(src)
   if (isSkipped(relPath)) {
     stats.skipped.push(relPath)
@@ -83,14 +84,10 @@ function publish(src) {
     return '> '
   })
 
-  // 2. 写 md
-  const dst = path.join(CONTENT, relPath)
-  fs.mkdirSync(path.dirname(dst), { recursive: true })
-  fs.writeFileSync(dst, text)
-  stats.md++
-
-  // 3. 复制图片，保持相对路径
+  // 2. 复制图片，保持相对路径；顺带转成 webp（原始笔记里的 png 不动）
   const srcDir = path.dirname(src)
+  const mdDirRel = path.dirname(relPath).split(path.sep).join('/')
+  const map = new Map()
   for (const r of imageRefs(text)) {
     const from = path.join(srcDir, r)
     if (!exists(from)) {
@@ -101,7 +98,29 @@ function publish(src) {
     fs.mkdirSync(path.dirname(to), { recursive: true })
     fs.copyFileSync(from, to)
     stats.img++
+
+    const conv = await convert(to)
+    if (conv) {
+      const relOld = path.relative(CONTENT, to).split(path.sep).join('/')
+      const relNew = path.relative(CONTENT, conv.out).split(path.sep).join('/')
+      if (relOld !== relNew) {
+        if (fs.existsSync(to)) fs.unlinkSync(to)
+        map.set(relOld, relNew)
+        stats.webp++
+        stats.bytesBefore += conv.before
+        stats.bytesAfter += conv.after
+      } else if (conv.reused === false) {
+        stats.webp++
+      }
+    }
   }
+
+  // 3. md 里的图片引用跟着改成 .webp，然后写盘
+  const rewritten = rewriteRefs(text, mdDirRel, map)
+  const dst = path.join(CONTENT, relPath)
+  fs.mkdirSync(path.dirname(dst), { recursive: true })
+  fs.writeFileSync(dst, rewritten.text)
+  stats.md++
 
   // 4. 记录会变灰的站内链接
   for (const r of docLinks(text)) {
@@ -132,9 +151,12 @@ const targets = args.includes('--all')
       return true
     })
 
-for (const t of targets) publish(t)
+for (const t of targets) await publish(t)
 
-console.log(`\n已发布 ${stats.md} 篇，复制图片 ${stats.img} 个，改写脚注 ${stats.footnote} 处`)
+const saved = stats.bytesBefore ? `（${(stats.bytesBefore / 1048576).toFixed(1)} MB → ${(stats.bytesAfter / 1048576).toFixed(1)} MB）` : ''
+console.log(
+  `\n已发布 ${stats.md} 篇，复制图片 ${stats.img} 个，转 webp ${stats.webp} 个${saved}，改写脚注 ${stats.footnote} 处`
+)
 if (stats.skipped.length) console.log(`按规则跳过 ${stats.skipped.length} 个文件（README / 模板）`)
 if (stats.missingImg.length) {
   console.log(`\n⚠ ${stats.missingImg.length} 处图片找不到（页面会显示破图）：`)
