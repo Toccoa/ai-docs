@@ -12,7 +12,7 @@ AI Agent / RAG 学习笔记的静态站点，用 [VitePress](https://vitepress.d
 ├── content/        已发布的文章副本（站点只读这里）
 │   ├── RAG 学习路线图/           成体系的学习路径，全量收录
 │   └── 每日 AI Agent 技术精选/   按日期归档，一天一个文件夹
-├── scripts/        publish.mjs 发布脚本、optimize-images.mjs 图片转 WebP
+├── scripts/        publish.mjs 发布脚本、optimize-images.mjs 图片转 WebP、link-knowledge-map.mjs 知识地图回链
 ├── _站点方案/      方案文档与预览截图
 └── *.md, 图片/     原始笔记，不参与构建
 ```
@@ -32,7 +32,8 @@ npm run docs:build   # 产物在 site/.vitepress/dist
 ```bash
 node scripts/publish.mjs "深度精讲-xxx.md"   # 单篇：自动分流到对应板块，连图片一起转 WebP
 node scripts/publish.mjs --all              # 把能发的全发一遍
-node scripts/publish.mjs                    # 只看会落到哪、还有哪些没发
+node scripts/publish.mjs --list             # 只看会落到哪、还有哪些没发
+node scripts/link-knowledge-map.mjs         # 日报里出现新知识点后，给知识地图补链接
 node scripts/publish.mjs "某篇.md" --to "每日 AI Agent 技术精选/2026-11-12"   # 落点不对时手动指定
 npm run images                             # 单独把 content/ 里的图转一遍（可选）
 git add -A && git commit -m "add: xxx" && git push

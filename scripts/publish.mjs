@@ -24,6 +24,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { convert } from './optimize-images.mjs'
+import { collectCoverage, linkMap } from './link-knowledge-map.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const CONTENT = path.join(ROOT, 'content')
@@ -31,6 +32,11 @@ const CONTENT = path.join(ROOT, 'content')
 const RAG_SRC = 'RAG 每日精进'
 const RAG_DEST = 'RAG 学习路线图'
 const DAILY_DEST = '每日 AI Agent 技术精选'
+
+// 文件名里的日期不一定是它该待的那天（比如和姊妹篇放在一起），这里钉死
+const PIN = {
+  'Anthropic-Agent-Memory-全文翻译-2026-11-06.md': `${DAILY_DEST}/2026-11-10`,
+}
 
 // 这些永远不进站点
 const SKIP = [/^_站点方案\//, /^site\//, /^content\//, /^node_modules\//, /^\.git\//, /(^|\/)README\.md$/, /03-模板\.md$/]
@@ -73,6 +79,8 @@ function destRelOf(src, overrideTo) {
 
   const [head, ...rest] = r.split('/')
   if (head === RAG_SRC) return path.posix.join(RAG_DEST, ...rest)
+
+  if (PIN[base]) return path.posix.join(PIN[base], base)
 
   const m = base.match(/(\d{4}-\d{2}-\d{2})/)
   const date = m ? m[1] : localDate(fs.statSync(src).mtime)
@@ -121,8 +129,9 @@ function indexByBasename(items) {
   const map = new Map()
   const dup = new Set()
   for (const { base, destRel } of items) {
-    if (map.has(base)) dup.add(base)
-    else map.set(base, destRel)
+    // plan 里的文件通常也已经存在于 content/ 里，落点相同不算冲突
+    if (!map.has(base)) map.set(base, destRel)
+    else if (map.get(base) !== destRel) dup.add(base)
   }
   for (const d of dup) map.delete(d)
   return map
@@ -137,7 +146,7 @@ async function main() {
   const allFiles = walk(ROOT).filter((p) => !isSkipped(rel(p)))
   const listOnly = args.includes('--list')
 
-  if (!args.length) {
+  if (!args.length || listOnly) {
     const pending = allFiles.filter((p) => !exists(path.join(CONTENT, destRelOf(p, overrideTo))))
     console.log(`可发布 ${allFiles.length} 篇，其中还没发布 ${pending.length} 篇：`)
     for (const p of pending) console.log(`  ${posix(rel(p))}  →  ${destRelOf(p, overrideTo)}`)
@@ -147,13 +156,15 @@ async function main() {
 
   const targets = args.includes('--all')
     ? allFiles
-    : args.map((a) => path.resolve(ROOT, a)).filter((p) => {
-        if (!exists(p)) {
-          console.error(`跳过（找不到）：${a}`)
-          return false
-        }
-        return true
-      })
+    : args
+        .map((a) => path.resolve(ROOT, a))
+        .filter((p) => {
+          if (!exists(p)) {
+            console.error(`跳过（找不到）：${posix(rel(p))}`)
+            return false
+          }
+          return true
+        })
 
   // 第一遍：算出每篇的落点，这样才能把「指向某篇文章的链接」重算到新位置
   const plan = targets.map((src) => ({ src, destRel: destRelOf(src, overrideTo) }))
@@ -171,7 +182,7 @@ async function main() {
     await publishOne(src, destRel, byBase)
   }
 
-  report(listOnly)
+  report()
 }
 
 async function publishOne(src, destRel, byBase) {
@@ -253,8 +264,7 @@ function rewriteDest(text, kind, map) {
   })
 }
 
-function report(listOnly) {
-  if (listOnly) return
+function report() {
   for (const [from, to] of stats.routed) console.log(`  ${from}\n    → ${to}`)
   if (!stats.md) return
 
@@ -267,6 +277,16 @@ function report(listOnly) {
     console.log(`\n⚠ ${stats.missingImg.length} 处图片找不到（页面会显示破图）：`)
     for (const m of stats.missingImg) console.log('  ' + m)
   }
+
+  // 每日推荐里出现过的知识点，知识地图上没链接的提示一下
+  try {
+    const mapPath = path.join(ROOT, RAG_SRC, '00-RAG知识地图.md')
+    if (fs.existsSync(mapPath)) {
+      const before = fs.readFileSync(mapPath, 'utf8')
+      const { text } = linkMap(before, collectCoverage())
+      if (text !== before) console.log('\n💡 知识地图有新的知识点可以补链接：node scripts/link-knowledge-map.mjs')
+    }
+  } catch {}
 }
 
 main().catch((e) => {
