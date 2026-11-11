@@ -1,0 +1,21 @@
+/**
+ * 未发布文章的链接会被 config.mts 里的插件降级成这个 span。
+ * 不隐藏它，只是让它看起来"点不动"，避免读者以为站点坏了。
+ */
+.link-unpublished {
+  color: var(--vp-c-text-3);
+  text-decoration: line-through;
+  text-decoration-color: var(--vp-c-divider);
+  cursor: help;
+}
+
+/* 日报里的多列表格在窄屏会被压扁，给单元格一个下限让它横向滚动 */
+.vp-doc table th,
+.vp-doc table td {
+  min-width: 5em;
+}
+
+/* 中英混排密度高，行高略放宽一点更好读 */
+.vp-doc p {
+  line-height: 1.85;
+}

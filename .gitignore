@@ -1,0 +1,11 @@
+# 依赖
+node_modules/
+
+# 构建产物（提交进去会让仓库永久膨胀）
+site/.vitepress/dist/
+site/.vitepress/cache/
+
+# 系统与日志
+.DS_Store
+npm-debug.log*
+*.log
