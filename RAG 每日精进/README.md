@@ -10,6 +10,36 @@
 - 生成后写入 `02-每日推荐/YYYY-MM-DD.md`，并更新进度与索引。
 - 同一天重复触发不会重复生成；如果当天笔记已存在，只返回摘要。
 
+## 自动发布到站点
+
+- 每天生成完笔记与元数据后，**默认自动发布并推送**，站点地址：<https://blog.093681.xyz/>（板块「RAG 学习路线图」）。
+- 发布链路（在仓库根 `/Users/zhaochunyu/Documents/docspace/资讯/AI 文档` 执行）：
+
+```bash
+# 1) 按显式文件列表发布（源文件只读，不会写回）
+node scripts/publish.mjs "RAG 每日精进/02-每日推荐/YYYY-MM-DD.md" \
+  "RAG 每日精进/00-RAG知识地图.md" "RAG 每日精进/01-学习进度.md" "RAG 每日精进/04-索引.md"
+
+# 2) 知识地图回链（知识点标题必须写成「## 知识点 N：标题（Rxx-xx）」才会被识别）
+node scripts/link-knowledge-map.mjs
+
+# 3) 地图有变化时再发布一次，然后本地构建校验
+node scripts/publish.mjs "RAG 每日精进/00-RAG知识地图.md"
+npm run docs:build
+
+# 4) 提交并推送（22 端口被网络层阻断，走 ssh.github.com:443）
+git add -A && git commit -m "docs: RAG 每日推荐第 NNN 期（…）"
+GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/tmp/gh443_known_hosts -o StrictHostKeyChecking=yes -p 443" \
+  git push ssh://git@ssh.github.com:443/Toccoa/ai-docs.git main
+```
+
+- 若提示 `Host key verification failed`，先重建 known_hosts：`ssh -p 443 -o UserKnownHostsFile=/tmp/gh443_known_hosts git@ssh.github.com`（会自动写入主机密钥）。
+- 推送后 Pages 由 `.github/workflows/deploy.yml` 自动部署，通常 1–2 分钟；验证：
+  `curl -o /dev/null -w "%{http_code}" "https://blog.093681.xyz/RAG%20学习路线图/02-每日推荐/YYYY-MM-DD.html"` 应为 200。
+- 注意事项：
+  - **知识点标题格式**：`## 知识点 1：文档层级与父子关系（R1-07）`——ID 必须在全角括号内且位于标题末尾，否则知识地图不会自动回链。
+  - `git add -A` 会一并带入仓库里其他自动化产出的内容（如 `AI-Agent-开发日报-*.md`），这是当前约定。
+
 ## 文件说明
 
 | 文件 | 用途 |
