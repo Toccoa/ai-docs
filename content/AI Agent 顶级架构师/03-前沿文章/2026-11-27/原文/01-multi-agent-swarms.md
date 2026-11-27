@@ -4,7 +4,6 @@ Published November 26, 2026 [Update on GitHub](https://github.com/huggingface/bl
 
 作者：ben burtenshaw、Kashif Rasul（及 Hugging Face 社区贡献者）
 
-
 *Part 1: Understanding swarms and training to communicate*
 
 This is an aspirational blog series for aspirational readers. We (us, the community, you) want to build our own agent swarms because they're exciting, challenging, and increasingly capable. Furthermore, it would be extremely cool if we could train our own agents to work in a swarm. And exponentially cool if those swarms used small and affordable models.

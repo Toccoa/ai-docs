@@ -527,7 +527,7 @@ MXC takes concrete deny paths only, so Codex expands deny globs to matching file
 
 #### Network access
 
-Domain rules such as `*.openai.com` are enforced by the shared Codex network proxy described earlier. Codex runs that proxy outside the sandbox and passes its addresses to the command through the same standard `*_PROXY` environment variables as mentioned previously. MXC blocks direct external connections while allowing host-loopback connections, including access to the proxy. Other local services remain reachable.
+Domain rules such as `*.openai.com` are enforced by the shared Codex network proxy described earlier. Codex runs that proxy outside the sandbox and passes its addresses to the command through the same standard `\*_PROXY` environment variables as mentioned previously. MXC blocks direct external connections while allowing host-loopback connections, including access to the proxy. Other local services remain reachable.
 
 Across macOS, Linux, and Windows, the harness uses the same sandbox API to launch commands under a permission profile. The platform-specific implementations handle the setup needed to apply those restrictions.
 
