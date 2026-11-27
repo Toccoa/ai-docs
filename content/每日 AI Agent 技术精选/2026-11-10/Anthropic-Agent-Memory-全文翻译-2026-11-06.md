@@ -1,4 +1,4 @@
-# 《The components of agent memory》全文翻译
+# 《Agent 记忆的组成》全文翻译
 
 > 原文：The components of agent memory · Anthropic Research · 2026-11-06
 > 作者：Lance Martin（编辑指导：Caitlin Love、Tom Chivers、Rebecca Hiscott、Jake Eaton、Blake Wilson）

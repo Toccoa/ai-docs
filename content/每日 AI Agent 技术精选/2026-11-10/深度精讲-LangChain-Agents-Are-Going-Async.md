@@ -76,6 +76,8 @@ t=完成  Researcher 回报 → orchestrator 在"下一次模型调用前"领走
 ### 2.1 编程语言类比（原文最精准的一句）
 
 > An async subagent works like a task started with `asyncio.create_task` or a `Promise` you don't await yet.
+>
+> 异步子智能体就像用 `asyncio.create_task` 启动的任务，或者一个你还没 await 的 `Promise`。
 
 对应关系：
 
@@ -299,6 +301,8 @@ Managed 侧额外福利：**每个被服务的 agent 自带一个 `general-purpo
 LangChain 原文是一篇"**发布性质的架构宣言**"，讲清了机制，但对**异步化带来的新故障**着墨很少。外部评论（Trida AI《Async Agents Move the Failure Modes》）切中要害：
 
 > **Async removes a waiting problem. In exchange it creates a supervision problem.**
+>
+> **异步消除了「等待」问题，代价是引入了「监督」问题。**
 
 失败没有消失，**只是换了地址**——从"你眼前卡住"变成"你没看的线程里凌晨两点失败"。
 
@@ -350,6 +354,8 @@ LangChain 原文是一篇"**发布性质的架构宣言**"，讲清了机制，�
 原文最后给了一个**超出本文范围的判断**：
 
 > We expect this pattern to generalize beyond subagents to tools across the board. OpenAI recently added support for **async tool calling**.
+>
+> 我们预计这个模式会从子智能体扩展到所有工具。OpenAI 最近就新增了对**异步工具调用**的支持。
 
 对照 OpenAI 的 *Async tool calling* 文档，可以看到两条路线在**同一件事上的不同抽象层级**：
 
