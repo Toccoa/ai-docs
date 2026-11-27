@@ -132,7 +132,12 @@ function buildDir(dir: string): Item[] {
   }
 
   // 3. 其余子目录（不含 md 的，例如图片目录，直接跳过）
-  for (const name of dirs.filter((d) => !isDate(d)).sort((a, b) => a.localeCompare(b, 'zh'))) {
+  const isMonth = (n: string) => /^\d{4}-\d{2}$/.test(n)
+  for (const name of dirs.filter((d) => !isDate(d)).sort((a, b) => {
+    // 月份目录（2026-11）新的在前，其余目录沿用拼音序
+    if (isMonth(a) && isMonth(b)) return b.localeCompare(a)
+    return a.localeCompare(b, 'zh')
+  })) {
     const sub = buildDir(path.join(dir, name))
     if (sub.length) items.push({ text: name, collapsed: true, items: sub })
   }

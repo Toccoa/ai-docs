@@ -32,6 +32,13 @@ export default defineConfig({
   // 兜底：模板里的 {{ }} 不会报错，只会静默把文字吃掉，所以宁可排除
   srcExclude: ['**/README.md', '**/03-模板.md'],
 
+  // 前沿资料会把论文原文存档（PDF / arXiv HTML）随文章一起发布到 site 的同级 原文/ 目录。
+  // 那些文件是静态附件、不是 VitePress 页面，链接到它们会触发 dead link 检查，
+  // 所以只对这一类附件路径放行；其余死链仍然要让构建失败。
+  // 注意：链接在 markdown 里经 URL 编码后会变成 %E5%8E%9F%E6%96%87（「原文」），
+  // 所以两种写法都要匹配，否则只挡住明文、挡不住编码后的。
+  ignoreDeadLinks: [/\/原文\//, /%E5%8E%9F%E6%96%87\//i],
+
   // 部署到 GitHub Pages 项目站点时，base 必须写成 '/仓库名/'，否则白屏且无报错。
   // 这里由 CI 注入，本地默认 '/'，两边都不用改代码。
   base: process.env.DOCS_BASE || '/',

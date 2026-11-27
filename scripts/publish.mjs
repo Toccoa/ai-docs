@@ -28,6 +28,11 @@ import { collectCoverage, linkMap } from './link-knowledge-map.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const CONTENT = path.join(ROOT, 'content')
+/**
+ * VitePress 把 srcDir 当作 Vite 的 root，所以「public 目录」实际是 content/public/
+ * （不是 site/public/）。放这里才会原样复制进 dist，站内相对链接才点得开。
+ */
+const PUBLIC = path.join(CONTENT, 'public')
 
 const RAG_SRC = 'RAG 每日精进'
 const RAG_DEST = 'RAG 学习路线图'
@@ -44,6 +49,10 @@ const SKIP = [/^_站点方案\//, /^site\//, /^content\//, /^node_modules\//, /^
 const isSkipped = (rel) => SKIP.some((re) => re.test(rel.split(path.sep).join('/')))
 
 const SRC_RE = /\.(png|jpe?g)$/i
+/** 正文里可以直接链到的二进制附件（原文存档等），会随 md 一起进站点 */
+const ATTACH_RE = /\.(pdf|html?|csv|json|txt|zip)$/i
+/** 与文章同级、需要整体随文章进站点的存档目录 */
+const ATTACH_DIRS = ['原文']
 const posix = (p) => p.split(path.sep).join('/')
 const rel = (p) => path.relative(ROOT, p)
 
@@ -110,8 +119,22 @@ function mdLinks(text) {
   return [...refs]
 }
 
+/** 正文里的站内附件链接（相对路径、非图片、非 md） */
+function fileLinks(text) {
+  const refs = new Set()
+  for (const m of text.matchAll(/(?<!!)\[[^\]]*\]\(\s*(<[^>]+>|[^)\s]+)/g)) {
+    const raw = m[1].replace(/^<|>$/g, '')
+    if (/^(https?:|mailto:|data:|#|\/)/i.test(raw)) continue
+    if (/\.md(#|$)/.test(raw)) continue
+    if (!ATTACH_RE.test(raw.split('#')[0].split('?')[0])) continue
+    refs.add(decodeURI(raw.split('#')[0]))
+  }
+  return [...refs]
+}
+
 const stats = {
   md: 0,
+  attach: 0,
   img: 0,
   webp: 0,
   bytesBefore: 0,
@@ -119,6 +142,7 @@ const stats = {
   footnote: 0,
   relinked: 0,
   missingImg: [],
+  missingAttach: [],
   grayLinks: [],
   skipped: [],
   routed: [],
@@ -231,6 +255,31 @@ async function publishOne(src, destRel, byBase) {
     if (nextRef !== r) linkMap.set(r, nextRef)
   }
 
+  // 3b. 附件（PDF/HTML 等原文存档）：复制到 md 同级的相对位置，链接重算
+  for (const r of fileLinks(text)) {
+    const from = path.join(srcDir, r)
+    if (!exists(from)) {
+      stats.missingAttach.push(`${posix(rel(src))} → ${r}`)
+      continue
+    }
+    const targetRel = path.posix.normalize(path.posix.join(mdDirRel, r))
+    const to = path.join(PUBLIC, targetRel)
+    fs.mkdirSync(path.dirname(to), { recursive: true })
+    if (!exists(to) || fs.statSync(to).size !== fs.statSync(from).size) {
+      fs.copyFileSync(from, to)
+      stats.attach++
+    }
+    linkMap.set(r, path.posix.relative(mdDirRel || '.', targetRel))
+  }
+
+  // 3c. 约定目录镜像：`05-前沿资料/原文/` 这类与文章同级的存档目录整体随行
+  for (const dirName of ATTACH_DIRS) {
+    const from = path.join(srcDir, dirName)
+    if (!fs.existsSync(from) || !fs.statSync(from).isDirectory()) continue
+    const targetRel = path.posix.join(mdDirRel, dirName)
+    stats.attach += mirrorDir(from, path.join(PUBLIC, targetRel))
+  }
+
   // 4. 一次性做替换——只改 `](...)` 里的目标，正文里同名的普通文字不动
   text = rewriteDest(text, 'img', imgMap)
   text = rewriteDest(text, 'link', linkMap)
@@ -241,6 +290,28 @@ async function publishOne(src, destRel, byBase) {
   fs.mkdirSync(path.dirname(dst), { recursive: true })
   fs.writeFileSync(dst, text)
   stats.md++
+}
+
+/** 递归镜像目录，返回实际复制的文件数（大小/时间不同才复制） */
+function mirrorDir(from, to) {
+  let n = 0
+  for (const e of fs.readdirSync(from, { withFileTypes: true })) {
+    if (e.name.startsWith('.')) continue
+    const src = path.join(from, e.name)
+    const dst = path.join(to, e.name)
+    if (e.isDirectory()) {
+      n += mirrorDir(src, dst)
+      continue
+    }
+    fs.mkdirSync(path.dirname(dst), { recursive: true })
+    const a = fs.statSync(src)
+    const b = exists(dst) ? fs.statSync(dst) : null
+    if (!b || b.size !== a.size) {
+      fs.copyFileSync(src, dst)
+      n++
+    }
+  }
+  return n
 }
 
 /** 目标里有空格/括号时要写成 <…>，否则 markdown-it 不认 */
@@ -272,7 +343,12 @@ function report() {
   console.log(
     `\n已发布 ${stats.md} 篇，图片 ${stats.img} 个（转 webp ${stats.webp} 个${saved}），重算链接 ${stats.relinked} 处，改写脚注 ${stats.footnote} 处`
   )
+  if (stats.attach) console.log(`附件（原文存档）${stats.attach} 个已随文章复制到站点`)
   if (stats.skipped.length) console.log(`按规则跳过 ${stats.skipped.length} 个文件（README / 模板）`)
+  if (stats.missingAttach.length) {
+    console.log(`\n⚠ ${stats.missingAttach.length} 处附件找不到（页面会显示死链）：`)
+    for (const m of stats.missingAttach) console.log('  ' + m)
+  }
   if (stats.missingImg.length) {
     console.log(`\n⚠ ${stats.missingImg.length} 处图片找不到（页面会显示破图）：`)
     for (const m of stats.missingImg) console.log('  ' + m)

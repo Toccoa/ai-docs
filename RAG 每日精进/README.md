@@ -40,6 +40,18 @@ GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/tmp/gh443_known_hosts -o StrictHostK
   - **知识点标题格式**：`## 知识点 1：文档层级与父子关系（R1-07）`——ID 必须在全角括号内且位于标题末尾，否则知识地图不会自动回链。
   - `git add -A` 会一并带入仓库里其他自动化产出的内容（如 `AI-Agent-开发日报-*.md`），这是当前约定。
 
+## 前沿资料的默认处理（2026-11-27 起）
+
+每期「今日前沿插入」里出现的**非中文来源**，默认做三件事，不再逐次询问：
+
+1. **译成中文**：条目正文全中文；英文标题保留原文并附中文译名，避免检索时对不上。
+2. **下载到本地**：跑 `bash scripts/fetch-frontier-originals.sh`——ACL Anthology 的 PDF 逐一比对 `Content-Length` + `%%EOF` 才留；arXiv 的 PDF 在本网络下会被限速截断（实测约 4 KB/s），**改存 HTML 版本**（判据：含 `</html>` 且 >20 KB）。拿不到存档的，条目里只留原文链接，**不假装有**。
+3. **随文章上线**：`scripts/publish.mjs` 会把与文章同级的 `原文/` 目录镜像到 **`content/public/`**（VitePress 把 `srcDir` 当 Vite root，所以有效 publicDir 是 `content/public/`，**不是** `site/public/`），构建时原样复制进站点。条目里的 `[PDF](原文/…)` 因此在 GitHub Pages 上可点。
+
+- 归档位置：`RAG 每日精进/05-前沿资料/原文/`（PDF）与 `原文/html/`（arXiv HTML），索引页是 `05-前沿资料/index.md`。
+- 同一主题的 2–3 篇会**合并成一篇精读**，避免碎片化；每篇必带「精评：值钱处 / 不能当真处」和「对你的动作」。
+- 站点侧死链检查只对 `/原文/`（含 URL 编码形式 `%E5%8E%9F%E6%96%87/`）放行，其他死链仍会让构建失败。
+
 ## 文件说明
 
 | 文件 | 用途 |
