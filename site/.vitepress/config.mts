@@ -18,7 +18,14 @@ function published(href: string, fromDir: string): boolean {
   const p = clean.startsWith('/')
     ? path.join(CONTENT, clean.slice(1))
     : path.resolve(fromDir, clean)
-  for (const c of [p, p + '.md', path.join(p, 'index.md')]) {
+  const candidates = [p, p + '.md', path.join(p, 'index.md')]
+  // 静态附件（论文原文存档等）发布在 content/public/<同路径> 下，不在 content/<同路径>；
+  // 不补这一条，`[PDF](原文/x.pdf)` 会被误判成"未发布文章"并被降级成纯文本。
+  const relToContent = path.relative(CONTENT, p)
+  if (!relToContent.startsWith('..')) {
+    candidates.push(path.join(CONTENT, 'public', relToContent))
+  }
+  for (const c of candidates) {
     try {
       if (fs.statSync(c).isFile()) return true
     } catch {}
