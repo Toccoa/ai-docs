@@ -9,7 +9,7 @@ export const CONTENT = path.resolve(HERE, '../../content')
 type Item = { text: string; link?: string; collapsed?: boolean; items?: Item[] }
 
 /** 板块顺序（目录名）；不在这里的目录排在后面，按名称排 */
-const SECTION_ORDER = ['RAG 学习路线图', '每日 AI Agent 技术精选']
+const SECTION_ORDER = ['RAG 学习路线图', 'AI Agent 效果测评', '每日 AI Agent 技术精选']
 
 /**
  * 同一天里几篇的先后。顺序即优先级，命不中的排最后。

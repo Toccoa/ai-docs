@@ -9,3 +9,5 @@ site/.vitepress/cache/
 .DS_Store
 npm-debug.log*
 *.log
+# 原始抓取快照（本地存档，不入库）
+_raw/

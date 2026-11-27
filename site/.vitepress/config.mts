@@ -87,6 +87,7 @@ export default defineConfig({
     nav: [
       { text: '首页', link: '/' },
       { text: 'RAG 学习路线图', link: '/RAG 学习路线图/' },
+      { text: 'Agent 效果测评', link: '/AI Agent 效果测评/' },
       { text: '每日精选', link: '/每日 AI Agent 技术精选/' },
     ],
     sidebar: buildSidebar(),
